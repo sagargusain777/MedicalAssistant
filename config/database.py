@@ -18,6 +18,6 @@ except Exception as e:
     print(f"Error connecting to MongoDB server: {e}")
 
 
-#database = client[MONGO_DB_NAME]
-#users_collection = database["users"]
+database = client[MONGO_DB_NAME]
+users_collection = database["users"]
 
