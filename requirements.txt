@@ -1,0 +1,6 @@
+fastapi[standard]
+uvicorn
+
+
+#Mongo DB
+pymongo[srv]
