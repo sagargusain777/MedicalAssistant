@@ -4,7 +4,7 @@ from fastapi.security import HTTPBasic ,HTTPBasicCredentials
 
 from .usersmodels import SignUpRequest
 from .hashpasswords import hash_password ,verify_password
-from ..config.database import users_collection
+from config.database import users_collection
 
 
 router = APIRouter()
@@ -20,7 +20,7 @@ def authenticate(credentials:HTTPBasicCredentials = Depends(security)):
     # Checking that if the password of user matches with the password in the database
     if not verify_password(credentials.password,user["password"]):
         raise HTTPException(status_code=401,detail= "Invalid credentials")
-    return {"username ":user["username"],"role":user["role"]}
+    return {"username": user["username"], "role": user["role"]}
 
   
 
@@ -37,7 +37,7 @@ def signup(request:SignUpRequest):
                                    "role":request.role
                           })
      return {"message": "User created successfullly"}
-    
+
 
     
 @router.get("/login")
