@@ -1,0 +1,17 @@
+langchain
+langchain_community
+langchain_google_genai
+langchain_text_splitters
+#vector database
+pinecone
+#Schema
+pydantic
+#Authentication
+bcrypt
+#database
+pymongo
+#config
+uvicorn
+python-dotenv
+#progressbar
+tqdm
