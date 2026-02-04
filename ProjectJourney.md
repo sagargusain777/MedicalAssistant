@@ -173,3 +173,102 @@ Connected authentication logic directly to:
 users_collection from MongoDB config.
 
 This made the database the single source of truth for users.
+✅ Step 14 — Create docs/ Module
+
+Added a new folder named docs to isolate document-processing and retrieval logic.
+
+Purpose: handle PDF ingestion, chunking, embeddings, and vector storage for the RAG pipeline.
+
+✅ Step 15 — Implement Vector Store Pipeline
+
+Inside docs/vectorstores.py, you:
+
+Loaded environment variables for:
+
+Google Generative AI embeddings API key.
+
+Pinecone API key.
+
+Pinecone environment.
+
+Pinecone index name.
+
+Injected API keys into runtime environment for LangChain compatibility.
+
+✅ Step 16 — Setup Upload Directory
+
+Created a server-side folder (./uploads) to persist files uploaded from the frontend.
+
+Used:
+
+os.makedirs(..., exist_ok=True)
+to avoid errors if the directory already exists.
+
+👉 This establishes your document ingestion layer.
+
+✅ Step 17 — Initialize Pinecone Client
+
+Created a Pinecone client using API credentials.
+
+Configured a ServerlessSpec:
+
+Cloud: AWS
+
+Region: us-east-1
+
+This prepares the vector database backend.
+
+✅ Step 18 — Auto-Create Vector Index
+
+Implemented logic to:
+
+List existing Pinecone indexes.
+
+Check whether the target index already exists.
+
+Create the index only if missing with:
+
+Dimension: 768
+
+Metric: dotproduct
+
+Poll Pinecone until the index status becomes READY.
+
+👉 This makes your system idempotent — safe to run multiple times without breaking infra.
+
+✅ Step 19 — Connect to Vector Index
+
+Retrieved a handle to the created Pinecone index object.
+
+This enables:
+
+Inserting embeddings.
+
+Running semantic search queries later.
+
+✅ Step 20 — Implement File-Upload Processing Function
+
+Created:
+
+🔹 load_vectorstore(uploaded_files, role: str, doc_id: str)
+
+Inside this function you:
+
+Initialized Google Gemini embedding model:
+
+gemini-embedding-001
+
+Iterated over uploaded files from frontend.
+
+Saved each file to disk inside ./uploads/.
+
+Used Path for OS-safe file paths.
+
+Wrote binary data correctly using "wb" mode.
+
+👉 This function becomes the entry point for:
+
+✔ Uploading medical PDFs
+✔ Persisting documents
+✔ Preparing them for chunking + embedding
+✔ Storing them in Pinecone (next step)
