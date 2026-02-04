@@ -78,3 +78,28 @@ def load_vectorstore(uploaded_files,role:str,doc_id:str):
             # and write them permanently to the server's filesystem
             f.write(file.file.read())
 
+            loader = PyPDFLoader(str(save_path))
+            document = loader.load()
+
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size = 500 , chunk_overlap = 200)
+            # Split the loaded document into multiple smaller chunked documents
+            chunked_documents = text_splitter.split_documents(document)
+           
+            texts = [chunk.page_content for chunk in chunked_documents]
+            #Generate unique IDs for every chunk
+            # Example: doc123-0, doc123-1, ...
+            ids = [f"{doc_id}-{i}" for i in range(len(chunked_documents))]
+            # Build metadata for each chunk
+            # Stored alongside vectors in Pinecone
+            metadata = [
+                {
+                    "source": file.filename,
+                    "doc_id": doc_id,
+                    "role": role,
+                    "page":chunk.metadata.get("page",0)
+                }
+                for i ,chunk in enumerate(chunked_documents)
+            ]
+
+
+
