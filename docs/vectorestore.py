@@ -60,3 +60,21 @@ if PINECONE_INDEX_NAME not in existing_index:
 
 # Get a handle to the Pinecone index so you can insert/search vectors
 index = pc.Index(PINECONE_INDEX_NAME)
+
+
+
+def load_vectorstore(uploaded_files,role:str,doc_id:str):
+     # Initialize the embedding model that will later convert text into vectors
+    embedding = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+     # Loop through every file uploaded from the frontend
+    for file in uploaded_files:
+        # Create the full path on the server where this file will be saved
+        # Example: ./uploads/report.pdf
+        save_path = Path(upload_directory)/file.filename
+        # Open a new file on disk in write-binary mode ("wb")
+        # This creates the file if it doesn't exist and overwrites it if it does
+        with open(save_path,"wb") as f:
+             # Read all bytes from the uploaded file (temporary storage)
+            # and write them permanently to the server's filesystem
+            f.write(file.file.read())
+
