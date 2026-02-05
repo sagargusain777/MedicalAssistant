@@ -65,7 +65,7 @@ index = pc.Index(PINECONE_INDEX_NAME)
 
 def load_vectorstore(uploaded_files,role:str,doc_id:str):
      # Initialize the embedding model that will later convert text into vectors
-    embedding = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+    embed_model = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
      # Loop through every file uploaded from the frontend
     for file in uploaded_files:
         # Create the full path on the server where this file will be saved
@@ -100,6 +100,15 @@ def load_vectorstore(uploaded_files,role:str,doc_id:str):
                 }
                 for i ,chunk in enumerate(chunked_documents)
             ]
+            print(f"Embedding {len(texts)} chunks...")
+            embeddings = embed_model.embed_documents(texts)
+
+            print(f"Uploading to Pinecone Database")
+            with tqdm(total=len(embeddings),desc="Upseting to Pinecone") as progress:
+                index.upsert(vectors=zip(ids,embeddings,metadata))
+                progress.update(len(embeddings))
+
+            print(f"Upload complete for {file.filename}")
 
 
 
