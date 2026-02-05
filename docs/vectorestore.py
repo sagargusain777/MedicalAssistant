@@ -7,6 +7,7 @@ from pinecone import Pinecone , ServerlessSpec
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+import asyncio
 
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -49,13 +50,13 @@ existing_index = [i["name"]for i in pc.list_indexes()]
 
 if PINECONE_INDEX_NAME not in existing_index:
     pc.create_index(
-                    name =PINECONE_INDEX_NAME,
+                    name = PINECONE_INDEX_NAME,
                     dimension=768,
                     metric="dotproduct",
-                    specs= spec
+                    spec= spec
               )
               ## Wait until the index is ready
-    while  not pc.describe_index(PINECONE_INDEX_NAME).status["READY"]:
+    while  not pc.describe_index(PINECONE_INDEX_NAME).status.state["READY"]:
         time.sleep(1)
 
 # Get a handle to the Pinecone index so you can insert/search vectors
@@ -63,7 +64,7 @@ index = pc.Index(PINECONE_INDEX_NAME)
 
 
 
-def load_vectorstore(uploaded_files,role:str,doc_id:str):
+async def load_vectorstore(uploaded_files,role:str,doc_id:str):
      # Initialize the embedding model that will later convert text into vectors
     embed_model = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
      # Loop through every file uploaded from the frontend
@@ -101,7 +102,7 @@ def load_vectorstore(uploaded_files,role:str,doc_id:str):
                 for i ,chunk in enumerate(chunked_documents)
             ]
             print(f"Embedding {len(texts)} chunks...")
-            embeddings = embed_model.embed_documents(texts)
+            embeddings = await asyncio.to_thread(embed_model.embed_documents,texts)
 
             print(f"Uploading to Pinecone Database")
             with tqdm(total=len(embeddings),desc="Upseting to Pinecone") as progress:
