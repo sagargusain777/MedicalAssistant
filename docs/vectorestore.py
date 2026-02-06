@@ -66,7 +66,7 @@ index = pc.Index(PINECONE_INDEX_NAME)
 
 async def load_vectorstore(uploaded_files,role:str,doc_id:str):
      # Initialize the embedding model that will later convert text into vectors
-    embed_model = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001")
+    embed_model = GoogleGenerativeAIEmbeddings(model="gemini-embedding-001",output_dimensionality=768)
      # Loop through every file uploaded from the frontend
     for file in uploaded_files:
         # Create the full path on the server where this file will be saved
